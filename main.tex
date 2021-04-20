@@ -1,0 +1,190 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{bm}
+\usepackage{multirow}
+\usepackage{amsfonts}
+\title{Local Fourier Analysis for Additive Schwarz Smoothers }
+\author{Carmen Rodrigo Cardiel}
+\date{September 2020}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\section{Local Fourier Analysis}
+
+\section{Isogeometric analysis}
+
+Isogeometric analysis (IGA) is a numerical technique introduced by T. Hughes in ????. It is based on the use of spline-type basis functions for both the approximation of the solution and the construction of the computational domain. The starting point of this analysis lies on the B-spline functions. Given that these are parametric functions, a parametric space is needed. For this task, given a spline degree $p$ and a parametric mesh size $h=1/m$ we introduce a unique and uniform knot vector as follows:
+
+
+\begin{equation}
+    \Xi_{p,h} = \lbrace 0 = \xi_1 = \ldots = \xi_{p+1} <=  \ldots <= \xi_{m+1} = \ldots = \xi_{m+p+1} == 1  \rbrace,
+\end{equation}
+where $x_{i+p+1} =ih, i=0,\ldots,m$. Thus, the number of B-spline basis functions is given by $m$. This type of parametric spaces yields spline spaces with $\mathcal{C}^{p-r}$ global continuity, where $r$ is the number of repetitions of each internal knot. For sake of simplicity, firstly we will consider spline spaces with maximum continuity $\mathcal{C}^{p-1}$, that is, the case of $r=1$.
+
+\textbf{Remark: } The case of $r=p-1$ repetitions corresponds to the classical quadrilateral finite elements. Then, we will provide some results for FEM discretizations and compare them with IGA results.
+
+Now, given a partition of $(0,1)$ into $m$ subintervals $I_i=\left((i-1)h,ih\right)$ with $i=1,\ldots,m$, we define the spline space of degree $p \geq 1$ with $\mathcal{C}^{p-1}$ continuity as follows
+
+\begin{equation}
+\label{spline_space}
+\mathcal{S}_{p,h}^{p-1}(0,1) = \{ u_h \in C^{p-1}(0,1) : u_h |_{I_i} \in {\mathbb P}^p, i = 1, \ldots, m, u_h(0) = u_h(1) = 0\}, 
+\end{equation} 
+
+where $C^{p-1}(0,1)$ is the space of all $p-1$ times continuously differentiable functions on $(0,1)$, and ${\mathbb P}^p$ is the space of all polynomials of degree less than or equal to $p$. Now, let us introduce the piecewise constant B-spline functions $N_i^0: [0,1] \rightarrow \mathbb{R}$:
+
+\begin{equation}
+    \label{constant_spline}
+	N_{i}^0(\xi)=\left\lbrace 
+	\begin{array}{ll}
+	1 & \text{if } \xi_{i} \leq \xi < \xi_{i+1}, \\
+	0 & \text{otherwise.} \\
+	\end{array}\right.
+\end{equation}
+
+For the cases of spline degree $p>0$, the basis functions $N_{i}^k : [0,1] \rightarrow {\mathbb R}$ are recursively defined by the Cox-de-Boor formula:
+
+\begin{equation}
+\label{order_spline}
+	N_{i}^k(\xi)= \displaystyle\frac{\xi - \xi_{i}}{\xi_{i+k} - \xi_{i}} N_{i}^{k-1}(\xi) + \displaystyle\frac{\xi_{i+k+1} - \xi}{\xi_{i+k+1} - \xi_{i+1}} N_{i+1}^{k-1}(\xi).
+\end{equation}	 
+
+The non-uniform rational B-splines (NURBS) are a generalization of the previous functions that allows us to capture exactly the geometries of more complex domains. A NURBS basis function of degree $p$ is 
+$$
+R_i^p(\xi) = \frac{\omega_i N_i^p(\xi)}{\sum_{k=1}^{p+m} \omega_k N_k^p(\xi)},
+$$
+where $\{\omega_1, \ldots, \omega_{p+m}\}$ is a given set of weights. 
+
+The definitions given until now can be generalized to higher spatial dimensions $d>1$ by means of tensor product. Hence, in the two-dimensional case ($d=2$), the corresponding knot vector is
+
+$$
+\Xi_{p,h} \times \Xi_{p,h} = \{(\xi,\eta), \xi \in \Xi_{p,h}, \eta \in \Xi_{p,h}\}.
+$$
+
+In addition, this parametric space yields B-spline basis functions $N_{i,j}^p: [0,1]^2 \rightarrow {\mathbb R}$ with polinomial degree $p$ given by
+
+$$
+N_{i,j}^p(\xi,\eta) = (N_i^p \otimes N_j^p)(\xi,\eta) = N_i^p(\xi) N_j^p(\eta).
+$$ 
+
+Furthermore, two-dimensional NURBS are introduced by means of a set of weights $\lbrace\omega_{i,j}\rbrace_{i,j=1}^{p+m}$:
+
+$$
+R_{i,j}^p(\xi,\eta) = \frac{ \omega_{i,j} N_{i,j}^p(\xi,\eta)}{\sum_{k,l=1}^{p+m} \omega_{k,l} N_{k,l}^p(\xi,\eta) }.
+$$
+
+Now, given this brief introduction to IGA, let us give some results provided by LFA to this type of discretizations. Firstly, we consider the following two-point boundary value problem:
+$$
+-u''(x) = f(x), \quad x \in \Omega, \quad  u(0) = u(1) = 0,
+$$
+
+\noindent such that $u(x)=\sin(5\pi x)$. We use B-spline discretizations in order to approximate the solution of this problem. 
+
+Here, we suggest to apply a multigrid method based on V(1,0) cycles using additive Schwarz methods as smoothers with maximum overlapping. For this task, three-point, five-point and seven-point additive Schwarz smoothers are considered. We carried out a Local Fourier Analysis of these methods by studying the effect of the operators involved in $n$ points of an infinite grid. For the three-point, five-point and seven-point additive Schwarz smoothers the number of points $n$ considered in our analysis is $n=4,6,8$ points respectively. The solution obtained at each local problem is multiplied by a parameter $\omega=1/m$, with $m$ the block-size of the corresponding smoother.
+
+In Table \ref{table_LFA_Schwarz_1D}, we show the two-grid ($\rho^V_{2g}$) convergence factors predicted by LFA together with the asymptotic convergence factors provided by the V(1,0)-cycle multigrid code ($\rho^V_h$) with a mesh size $h=2^{-11}$, for different spline degrees $p$. We would like to point out the good match among the convergence factors provided by the analysis and the ones obtained by means of our numerical experiments.
+
+
+\begin{table}[htb]
+	\begin{center}
+		\begin{tabular}{ccccccc}
+			\cline{2-7}
+			& \multicolumn{2}{c}{3p Schwarz} & \multicolumn{2}{c}{5p Schwarz} & \multicolumn{2}{c}{7p Schwarz}\\
+%			\cline{2-7}
+			& \multicolumn{2}{c}{$\omega = 1/3$} & \multicolumn{2}{c}{$\omega = 1/5$} & \multicolumn{2}{c}{$\omega = 1/7$}\\
+			\cline{2-7}
+			& $\rho^V_{2g}$ & $\rho^V_h$ & $\rho^V_{2g}$ & $\rho^V_h$ & $\rho^V_{2g}$ & $\rho^V_h$ \\
+			\hline
+			$p = 1$ & 0.3333  & 0.3316  & 0.2000  & 0.1990  & 0.1425  &  0.1421  \\
+			$p = 2$ & 0.3679  & 0.3661  & 0.1911  & 0.1901  & 0.1593  &  0.1589  \\
+			$p = 3$ & 0.4133  & 0.4114  & 0.2224  & 0.2211  & 0.1813  &  0.1810  \\
+			$p = 4$ & 0.4526  & 0.4504  & 0.3001  & 0.2990  & 0.2241  &  0.2237  \\
+			$p = 5$ & 0.6196  & 0.6210  & 0.4736  & 0.4723  & 0.3670  &  0.3665  \\
+			$p = 6$ & 0.7629  & 0.7673  & 0.6229  & 0.6229  & 0.5032  &  0.5030  \\
+			$p = 7$ & 0.8585  & 0.8647  & 0.7414  & 0.7436  & 0.6239  &  0.6254  \\
+			$p = 8$ & 0.9185  & 0.9250  & 0.8295  & 0.8337  & 0.7237  &  0.7287  \\
+			\hline
+		\end{tabular}
+	\caption{One-dimensional case: Two-grid ($\rho^V_{2g}$) convergence factors predicted by LFA together with the asymptotic convergence factors provided by the V(1,0)-cycle multigrid code ($\rho^V_h$), for different spline degrees $p$.}
+	\label{table_LFA_Schwarz_1D}
+	\end{center}
+\end{table}
+
+LFA also provides good predictions of the asymptotic convergence factors for the two-dimensional case. Hence, let us consider the 2D Poisson equation:
+\begin{equation}
+\begin{array}{ccc}
+-\Delta u  &=& f, \ \  \mbox{in} \quad \Omega, \\ 
+u &=& 0, \ \  \mbox{on} \quad \partial \Omega.
+\end{array}
+\end{equation}
+
+\noindent such that $u(x,y)=\sin(\pi x) \sin(\pi y)$. We use again B-spline discretizations in order to approximate the solution of this problem. 
+
+In order to approximate the solution of the system, we suggest to apply a multigrid method based on V(1,1) cycles using additive Schwarz methods as smoothers with maximum overlapping. First, we consider a hierarchy of grids with different $h$ sizes. In this problem, we consider $9$-point, $25$-point, $49$-point and $81$-point additive Schwarz smoothers. For these smoothers, the number of points $n$ considered in our LFA is $n=16,36,64,100$ points respectively. The solution obtained at each local problem is multiplied by a parameter $\omega=1/m$, with $m$ the block-size of the corresponding smoother.
+
+In Table \ref{table_LFA_Schwarz_2D}, we show the two-grid ($\rho^V_{2g}$) convergence factors predicted by LFA together with the asymptotic convergence factors provided by the V(1,1)-cycle multigrid code ($\rho^V_h$), for different spline degrees $p$:
+
+\begin{table}[htb]
+	\begin{center}
+		\begin{tabular}{ccccccccc}
+			\cline{2-9}
+			& \multicolumn{2}{c}{9p Schwarz} & \multicolumn{2}{c}{25p Schwarz} & \multicolumn{2}{c}{49p Schwarz} & \multicolumn{2}{c}{81p Schwarz}\\
+			%			\cline{2-7}
+			& \multicolumn{2}{c}{$\omega = 1/9$} & \multicolumn{2}{c}{$\omega = 1/25$} & \multicolumn{2}{c}{$\omega = 1/49$} & \multicolumn{2}{c}{$\omega = 1/81$}\\
+			\cline{2-9}
+			& $\rho^V_{2g}$ & $\rho^V_h$ & $\rho^V_{2g}$ & $\rho^V_h$ & $\rho^V_{2g}$ & $\rho^V_h$ & $\rho^V_{2g}$ & $\rho^V_h$\\
+			\hline
+			$p = 1$ & 0.0904  & 0.1028 &  0.0508 & 0.0898   & 0.0322  & 0.0555  & 0.0220 &    \\
+			$p = 2$ & 0.2359  & 0.2340 & 0.1180  & 0.1178   & 0.0662  & 0.0661  & 0.0430 &    \\
+			$p = 3$ & 0.5668  & 0.5737 & 0.3474  & 0.3424   & 0.2123  & 0.2139  & 0.1440 &    \\
+			$p = 4$ & 0.8033  & 0.8088 & 0.5959  & 0.5947   & 0.4092  & 0.4137  & 0.2957 &    \\
+			$p = 5$ & 0.9290  & 0.9295 & 0.7852  & 0.7811   & 0.6056  & 0.6091  & 0.4704 &    \\
+			$p = 6$ & 0.9729  & 0.9774 & 0.8991  & 0.8941   & 0.7634  & 0.7683  & 0.6361 &    \\
+			$p = 7$ & 1.2338  & 1.2445 & 0.9570  & 0.9549   & 0.8707  & 0.8688  & 0.7705 &    \\
+			$p = 8$ & 1.6276  & 1.7176 & 0.9831  & 0.9830   & 0.9349  & 0.9304  & 0.8662 &    \\
+			\hline
+		\end{tabular}
+		\caption{Two-dimensional case: Two-grid ($\rho^V_{2g}$) convergence factors predicted by LFA together with the asymptotic convergence factors provided by the V(1,0)-cycle multigrid code ($\rho^V_h$), for different spline degrees $p$.}
+		\label{table_LFA_Schwarz_2D}
+	\end{center}
+\end{table}
+
+This match between the experimental factors and those predicted by the analysis proves again that LFA is a useful tool for IGA in the two-dimensional case. 
+
+
+%We can improve the performance of the solver by multiplying by an additional parameter $\omega_2$. In Table \ref{table_LFA_Schwarz_2D_param}, we show the optimal choice of this parameter and the corresponding convergence factors provided by LFA for every smoother and different spline degrees:
+
+%\begin{table}[htb]
+%	\begin{center}
+%		\begin{tabular}{ccccccccc}
+%			\cline{2-9}
+%			& \multicolumn{2}{c}{9p Schwarz} & \multicolumn{2}{c}{25p Schwarz} & \multicolumn{2}{c}{49p Schwarz} & \multicolumn{2}{c}{81p Schwarz}\\
+%			\cline{2-9}
+%			& $\omega_2$ & $\rho^V_{2g}$ & $\omega_2$ & $\rho^V_{2g}$ & $\omega_2$ & $\rho^V_{2g}$ & $\omega_2$ & $\rho^V_{2g}$ \\
+%			\hline
+%			$p = 1$ &  0.8700  & 0.0544 & 0.8900 & 0.0306  & 0.9200  & 0.0194 & 0.9300  & 0.0131  \\
+%			$p = 2$ &  1.1600  & 0.1633 & 1.1100 & 0.0738  & 1.0800  & 0.0395 & 1.0500  & 0.0281   \\
+%			$p = 3$ &  1.2400  & 0.4810 & 1.2200 & 0.2497  & 1.1700  & 0.1362 & 1.1400  & 0.0877  \\
+%			$p = 4$ &  1.2100  & 0.7648 & 1.2900 & 0.4982  & 1.2500  & 0.3021 & 1.2200  & 0.1985  \\
+%			$p = 5$ &  1.1400  & 0.9192 & 1.3100 & 0.7239  & 1.3100  & 0.5033 & 1.2900  & 0.3538  \\
+%			$p = 6$ &  1.0300  & 0.9722 & 1.2900 & 0.8708  & 1.3400  & 0.6902 & 1.3400  & 0.5311  \\
+%			$p = 7$ &  0.9400  & 0.9917 & 1.2400 & 0.9468  & 1.3300  & 0.8300 & 1.3700  & 0.6932  \\
+%			$p = 8$ &  0.8700  & 0.9976 & 1.1800 & 0.9800  & 1.3000  & 0.9158 & 1.3800  & 0.8179  \\
+%			\hline
+%		\end{tabular}
+%		\caption{Two-dimensional case: Two-grid ($\rho^V_{2g}$) convergence factors predicted by LFA using optimal parameter $\omega_2$ together with the asymptotic convergence factors provided by the V(1,0)-cycle multigrid code ($\rho^V_h$), for different spline degrees $p$.}
+%		\label{table_LFA_Schwarz_2D_param}
+%	\end{center}
+%\end{table}
+
+
+
+
+\section{Saddle point problems}
+
+\section{Conclusions}
+
+\end{document}
